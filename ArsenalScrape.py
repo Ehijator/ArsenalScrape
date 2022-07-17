@@ -19,10 +19,15 @@ starturl = r"https://fbref.com/en/squads/18bb7c10/history/Arsenal-Stats-and-Hist
 
 driver.get(starturl)
 list = []
+id = ["//*[@id='comps_fa_club_league']/tbody/tr","//*[@id='comps_intl_club_cup']/tbody/tr","//*[@id='comps_fa_club_cup']/tbody/tr","//*[@id='comps_fa_club_supercup']/tbody/tr"]
+
 def Nav():
     time.sleep(10)
     driver.find_element(By.XPATH,'//*[@id="qc-cmp2-ui"]/div[2]/div/button[3]').click()
-    dg = driver.find_elements(By.XPATH,"//*[@id='comps_fa_club_league']/tbody/tr")
+
+
+def scrape(idname):
+    dg = driver.find_elements(By.XPATH,idname)
     for tr in dg:
         try:
             Season = tr.find_element(By.XPATH,"./th[1]").text
@@ -41,7 +46,7 @@ def Nav():
             TopKeeper = tr.find_element(By.XPATH,"./td[15]").text
         
 
-            DomesticCompetition = {
+            Competition = {
                 "Season": Season,
                 "Competition":Competition,
                 "LeagueRank":LeagueRank,
@@ -58,13 +63,23 @@ def Nav():
                 "TopKeeper":TopKeeper
             }
             
-            list.append(DomesticCompetition)
+            list.append(Competition)
         except NoSuchElementException:
             continue
     
     df = pd.DataFrame(list)
     print(df)
+    df.to_csv(r"C:\Python310\Scripts\ArsenalScrape\Arsenal.csv")
     
 
-Nav()
-#driver.quit()
+def main():  
+    print("Now Scraping...Go Gunners!") 
+    for x in id:
+        scrape(x)
+    
+    print("Completed Sucessfully")
+    driver.quit()
+
+
+if __name__ == "__main__":
+    main()
